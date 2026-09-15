@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI FullStack</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+    <!-- Alpine.js for interactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body class="h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col"
+    x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+
+    <!-- Navbar -->
+    <nav class="bg-white dark:bg-gray-800 shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="shrink-0 flex items-center">
+                        <a href="/" class="text-2xl font-bold text-primary">FastApp</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)"
+                        class="p-2 rounded-md text-gray-400 hover:text-gray-500 focus:outline-none">
+                        <span x-show="!darkMode">🌙</span>
+                        <span x-show="darkMode">☀️</span>
+                    </button>
+                    <!-- Auth Links (Dynamic based on JS auth state check is complex in SSR/CSR hybrid, simplified here for now) -->
+                    <div id="auth-nav" class="flex space-x-4">
+                        <a href="/login"
+                            class="text-gray-700 dark:text-gray-300 hover:text-primary px-3 py-2 rounded-md font-medium">Login</a>
+                        <a href="/register"
+                            class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">Sign Up</a>
+                    </div>
+                    <div id="user-nav" class="hidden flex space-x-4 items-center">
+                        <a href="/dashboard" class="text-gray-700 dark:text-gray-300 hover:text-primary">Dashboard</a>
+                        <button id="logout-btn" class="text-red-500 hover:text-red-700 font-medium">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 dark:text-gray-400">&copy; 2025 FastAPI Fullstack. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple Auth Check
+        const token = localStorage.getItem('token');
+        const authNav = document.getElementById('auth-nav');
+        const userNav = document.getElementById('user-nav');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (token) {
+            authNav.classList.add('hidden');
+            userNav.classList.remove('hidden');
+        } else {
+            authNav.classList.remove('hidden');
+            userNav.classList.add('hidden');
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                window.location.href = '/';
+            });
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>
